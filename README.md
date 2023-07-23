@@ -19,6 +19,6 @@ score moves based on a priority system (highest to lowest):
   - [ ] change depending on played color
   - [ ] detect and defend against common openings
 - [ ] add defense to priority system
-  - [ ] detect if about to get mated
-  - [ ] prioritize clearing the mate
+  - [ ] detect if about to get checked
+  - [ ] prioritize clearing the check
   - [ ] don't move to where enemy pieces can attack
