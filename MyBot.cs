@@ -12,7 +12,9 @@ public class MyBot : IChessBot
     // optional goal(s): add defense of own king to priority list
 
     // Piece values: null, pawn, knight, bishop, rook, queen, king
-    float[] captureValues = { 0, 1, 3, 3, 5, 9, 100 };
+    float[] captureValues = { 0, 5, 10, 15, 25, 40, 100 };
+
+
 
     bool myColor;
 
@@ -41,7 +43,7 @@ public class MyBot : IChessBot
         Random rng = new Random();
         int maxKey = scoredMoves.Max(x => x.Key);
 
-        foreach (var key in scoredMoves.Keys)
+        foreach (var key in scoredMoves.Keys.OrderBy(x => x))
         {
             Console.Write(key + " ");
         }
@@ -57,45 +59,61 @@ public class MyBot : IChessBot
         {
             case PieceType.Pawn:
                 if (myColor)
-                    score = move.TargetSquare.Rank / 7.0f;
+                    score = move.TargetSquare.Rank / 7.0f * 5 + 5;
                 else
-                    score = 1.0f - (move.TargetSquare.Rank / 7.0f);
+                    score = 5.0f - (move.TargetSquare.Rank / 7.0f * 5) + 5;
                 score += 1;
                 break;
             case PieceType.Knight:
-                score = DistanceToKing(board, move, myColor) / 10;
+                score = CrowdKing(board, move);
                 break;
             case PieceType.Bishop:
-                score = DistanceToKing(board, move, myColor) / 10;
+                score = CrowdKing(board, move);
                 break;
             case PieceType.Rook:
-                score = DistanceToKing(board, move, myColor) / 10;
+                score = RookScore(board, move);
                 break;
             case PieceType.Queen:
-                score = DistanceToKing(board, move, myColor) / 10;
+                score = QueenScore(board, move);
                 break;
             case PieceType.King:
-                score = DistanceToKing(board, move, myColor) / 10;
+                score = DistanceToKing(board, move) / 2;
                 break;
         }
 
         if (move.IsCapture)
             score = ScoreCapture(board, move);
         if (IsMovingIntoAttack(board, move))
-        {
             score -= 1;
-            if (move.CapturePieceType == PieceType.King)
-                score -= 10;
-        }
         if (IsGettingAttacked(board, move))
             score += 1;
-        if (move.IsEnPassant)
-            score *= 1;
         if (move.IsPromotion)
-            score += 3;
-        if (DistanceToKing(board, move, myColor) < 1.5)
-            score -= 5;
+            score += 1;
+        if (DistanceToKing(board, move) < 1.5)
+            score -= 2.5f;
         return score;
+    }
+
+    float QueenScore(Board board, Move move)
+    {
+        float score = RookScore(board, move);
+        score += 10 - DistanceToKing(board, move);
+        return score * 0.5f;
+    }
+
+    float RookScore(Board board, Move move)
+    {
+        Square king = board.GetKingSquare(!myColor);
+
+        float score = Math.Clamp(-MathF.Log2(MathF.Abs(move.TargetSquare.Rank - king.Rank)) + 2.8f, 0.0f, 10.0f);
+        score += Math.Clamp(-MathF.Log2(MathF.Abs(move.TargetSquare.File - king.File)) + 2.8f, 0.0f, 10.0f);
+
+        return score * 0.5f;
+    }
+
+    float CrowdKing(Board board, Move move)
+    {
+        return Math.Clamp(-MathF.Abs(DistanceToKing(board, move) - 2) + 10, 0.0f, 10.0f);
     }
 
     float ScoreCapture(Board board, Move move)
@@ -107,9 +125,9 @@ public class MyBot : IChessBot
         return targetValue;
     }
 
-    float DistanceToKing(Board board, Move move, bool color)
+    float DistanceToKing(Board board, Move move)
     {
-        return Distance(move.TargetSquare, board.GetKingSquare(!color));
+        return Distance(move.TargetSquare, board.GetKingSquare(!myColor));
     }
 
     float Distance(Square from, Square to)
