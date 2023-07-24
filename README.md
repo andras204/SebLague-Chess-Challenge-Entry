@@ -13,12 +13,8 @@ score moves based on a priority system (highest to lowest):
 - move closer to enemy king
 - move closer to enemy piece
 
-## optional goals
-- [ ] add a common opening
-  - [ ] choose which opening
-  - [ ] change depending on played color
-  - [ ] detect and defend against common openings
-- [ ] add defense to priority system
-  - [ ] detect if about to get checked
-  - [ ] prioritize clearing the check
-  - [ ] don't move to where enemy pieces can attack
+## TODO
+- [ ] priority function for bishops
+- [ ] normalize all priority values
+- [ ] add weights to normalized priorities
+- [ ] use machine learning to find an optimal set of weights
