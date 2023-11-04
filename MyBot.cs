@@ -6,11 +6,6 @@ using System.Linq;
 public class MyBot : IChessBot
 {
 
-    // HyperAgressor
-    // move prioritization:
-    // checkmate > attacking king / around king > taking pices > moving closer to king > moving closer to enemy piecies
-    // optional goal(s): add defense of own king to priority list
-
     // Piece values: null, pawn, knight, bishop, rook, queen, king
     float[] captureValues = { 0, 5, 10, 15, 25, 40, 100 };
 
@@ -48,6 +43,7 @@ public class MyBot : IChessBot
             Console.Write(key + " ");
         }
         Console.WriteLine();
+
         return scoredMoves[maxKey][rng.Next(scoredMoves[maxKey].Count)];
     }
 
@@ -59,9 +55,9 @@ public class MyBot : IChessBot
         {
             case PieceType.Pawn:
                 if (myColor)
-                    score = move.TargetSquare.Rank / 7.0f * 5 + 5;
+                    score = move.TargetSquare.Rank / 7.0f * 5 + 7.5f;
                 else
-                    score = 5.0f - (move.TargetSquare.Rank / 7.0f * 5) + 5;
+                    score = 5.0f - (move.TargetSquare.Rank / 7.0f * 5) + 7.5f;
                 score += 1;
                 break;
             case PieceType.Knight:
@@ -84,13 +80,13 @@ public class MyBot : IChessBot
         if (move.IsCapture)
             score = ScoreCapture(board, move);
         if (IsMovingIntoAttack(board, move))
-            score -= 1;
-        if (IsGettingAttacked(board, move))
-            score += 1;
-        if (move.IsPromotion)
-            score += 1;
-        if (DistanceToKing(board, move) < 1.5)
             score -= 2.5f;
+        if (IsGettingAttacked(board, move))
+            score += 1.5f;
+        if (move.IsPromotion)
+            score += 5;
+        if (DistanceToKing(board, move) < 1.5)
+            score -= 3.0f;
         return score;
     }
 
@@ -113,7 +109,7 @@ public class MyBot : IChessBot
 
     float CrowdKing(Board board, Move move)
     {
-        return Math.Clamp(-MathF.Abs(DistanceToKing(board, move) - 2) + 10, 0.0f, 10.0f);
+        return Math.Clamp(-MathF.Abs(DistanceToKing(board, move) - 2) + 10, 0.0f, 10.0f) - 5.0f;
     }
 
     float ScoreCapture(Board board, Move move)
