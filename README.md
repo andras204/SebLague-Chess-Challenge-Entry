@@ -1,6 +1,6 @@
 # SebLague-Chess-Challenge-Entry
 
-My entry for Sebastian Lague's *[Tiny Chess Bot Challenge](https://youtu.be/iScy18pVR58)*
+My entry for Sebastian Lague's [Tiny Chess Bot Challenge](https://youtu.be/iScy18pVR58)
 
 **Disclaimer:** I know very little (basically nothing) about chess
 
@@ -12,9 +12,3 @@ score moves based on a priority system (highest to lowest):
 - take enemy piece
 - move closer to enemy king
 - move closer to enemy piece
-
-## TODO
-- [ ] priority function for bishops
-- [ ] normalize all priority values
-- [ ] add weights to normalized priorities
-- [ ] use machine learning to find an optimal set of weights
